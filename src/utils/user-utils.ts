@@ -98,6 +98,7 @@ export function transformUsers(users: AllUserType[]) {
       phoneNumber: profileExists ? user.profile?.primaryPhoneNumber ?? '' : '',
       country: profileExists ? user.profile?.country ?? '' : '',
       city: profileExists ? user.profile?.city ?? '' : '',
+      __rawProfile: user.profile ?? null,
     };
   });
 }
