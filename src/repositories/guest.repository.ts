@@ -22,17 +22,25 @@ export class GuestRepository extends BaseRepository {
     return await guestRepository.count();
   }
 
-  async getAll() {
+  /**
+   * Get paginated users for admin
+   * @param param0 optional skip/take pagination
+   */
+  async getAll({ skip = 0, take = 50 } = {}) {
     const guestRepository = this.getRepository(User);
     const results = await guestRepository.find({
+      skip,
+      take,
       select: {
         email: true,
         firstName: true,
         lastName: true,
         active: true,
         id: true,
+        createdAt: true, // <-- include signup date
         profile: {
           country: true,
+          city: true, // <-- include city
           primaryPhoneNumber: true,
           photo: true,
         },

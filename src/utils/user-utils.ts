@@ -29,9 +29,11 @@ type AllUserType = {
   active: string;
   firstName: string;
   lastName: string;
-  profile: {
+  createdAt?: Date; // <-- added
+  profile?: {
     photo?: string;
     country?: string;
+    city?: string; // <-- added
     primaryPhoneNumber?: string;
   };
 };
@@ -41,6 +43,7 @@ export function removeMissingValues(obj: { [x: string]: string }) {
   const data = {};
   for (const key of keys) {
     if (obj[key] !== '' && obj[key] !== undefined) {
+      // @ts-expect-error - keeping same simple behaviour as before
       data[key] = obj[key];
     }
   }
@@ -80,18 +83,21 @@ export function transformWishlist(data: WishlistType[]) {
 }
 
 export function transformUsers(users: AllUserType[]) {
-  let profileExists = true;
   return users.map((user) => {
-    profileExists = !!user.profile;
+    const profileExists = !!user.profile;
     return {
       id: user.id,
       email: user.email,
       firstName: user.firstName,
-      active: user.active,
       lastName: user.lastName,
-      photo: profileExists ? user.profile.photo : '',
-      phoneNumber: profileExists ? user.profile.primaryPhoneNumber : '',
-      country: profileExists ? user.profile.country : '',
+      active: user.active,
+      // raw Date as returned from TypeORM; frontend can format as needed
+      createdAt: user.createdAt ?? null,
+      // flattened profile fields (safe fallbacks)
+      photo: profileExists ? user.profile?.photo ?? '' : '',
+      phoneNumber: profileExists ? user.profile?.primaryPhoneNumber ?? '' : '',
+      country: profileExists ? user.profile?.country ?? '' : '',
+      city: profileExists ? user.profile?.city ?? '' : '',
     };
   });
 }
